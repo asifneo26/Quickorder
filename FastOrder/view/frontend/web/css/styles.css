@@ -49,3 +49,155 @@
       opacity: 0;
     }
   }
+
+/* Drag and Drop Styles */
+.drag-drop-zone {
+    position: relative;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.drag-drop-zone:hover {
+    border-color: #007cba;
+    background-color: #f0f8ff;
+}
+
+.drag-over {
+    border-color: #007cba !important;
+    background-color: #e6f3ff !important;
+    box-shadow: 0 0 10px rgba(0, 124, 186, 0.3);
+}
+
+.drag-drop-zone button {
+    background-color: #007cba;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    margin: 10px 0;
+}
+
+.drag-drop-zone button:hover {
+    background-color: #005a87;
+}
+
+.drag-drop-zone button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.drag-drop-instructions {
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.drag-drop-instructions p {
+    margin: 5px 0;
+}
+
+.drag-drop-error {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border: 1px solid #ffcdd2;
+    border-radius: 4px;
+    margin: 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Enhanced upload area visual feedback */
+#fast-order-container.drag-over .drag-drop-zone {
+    border-color: #4caf50;
+    background-color: #e8f5e8;
+}
+
+#fast-order-container.drag-over .drag-drop-zone::after {
+    content: "Drop your CSV file here";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* File upload icon styling */
+.drag-drop-zone::before {
+    content: "📁";
+    display: block;
+    font-size: 48px;
+    margin-bottom: 10px;
+    opacity: 0.6;
+}
+
+.drag-over::before {
+    content: "📂";
+    opacity: 1;
+}
+
+/* Responsive design */
+@media only screen and (max-width: 768px) {
+    .drag-drop-zone {
+        padding: 15px;
+        margin: 5px 0;
+    }
+    
+    .drag-drop-zone button {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+    
+    .drag-drop-zone::before {
+        font-size: 36px;
+    }
+}
+
+/* Animation for smooth transitions */
+.drag-drop-zone,
+.drag-drop-zone button,
+.drag-drop-instructions {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Success feedback after file upload */
+.upload-success {
+    background-color: #e8f5e8;
+    border-color: #4caf50;
+    color: #2e7d32;
+}
+
+.upload-success::after {
+    content: "✓ File uploaded successfully!";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #4caf50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    20%, 80% { opacity: 1; }
+}
