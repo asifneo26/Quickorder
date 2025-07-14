@@ -31,13 +31,13 @@ if($filterAttribute){
 ?>
 <input type="hidden" id="fast-order-store-id" value="<?php echo $block->getStoreId(); ?>" />
 <input type="hidden" id="fast-order-store-code" value="<?php echo $block->getStoreCode(); ?>" />
-<div data-mage-init='{"quickview": {"message": "<?php echo $block->escapeHtmlAttr(__('fast order'));?>"}}' data-params='{"translate":<?php echo $translateTextString; ?>, "filterAttribute":<?php echo $filterAttributeString; ?>}' id="fast-order-container">
+<div data-mage-init='{"quickview": {"message": "<?php echo $block->escapeHtmlAttr(__('fast order'));?>"}, "dragDropUpload": {}}' data-params='{"translate":<?php echo $translateTextString; ?>, "filterAttribute":<?php echo $filterAttributeString; ?>}' id="fast-order-container">
     <!--    to mount html view-->
     <div class="fastorder-loading"><div class="lds-ripple"><div></div><div></div></div></div>
 </div>
 <div style="display: none">
     <form id="fast-order-csv-form" enctype="multipart/form-data">
         <input type="file" name="csv_file" id="csv_file" title="<?php echo $block->escapeHtmlAttr(__('Custom File'));?>" class="input-text"
-               data-validate="{required:true}">
+               data-validate="{required:true}" accept=".csv">
     </form>
 </div>
