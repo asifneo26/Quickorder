@@ -1,0 +1,51 @@
+<?php
+/**
+ * Copyright (c) 2019  Landofcoder
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ */
+
+/** @var $block \Lof\FastOrder\Block\QuickOrder */
+?>
+
+<div class="quick-order-page">
+    <div class="page-title-wrapper">
+        <h1 class="page-title">
+            <span class="base" data-ui-id="page-title-wrapper">
+                <i class="icon-lightning"></i>
+                <?= $block->escapeHtml(__('Quick Order')) ?>
+            </span>
+        </h1>
+        <p class="page-subtitle">
+            <?= $block->escapeHtml(__('Upload CSV files or search products manually for bulk ordering')) ?>
+        </p>
+    </div>
+
+    <div id="quick-order-app" data-config='<?= $block->escapeHtmlAttr($block->getQuickOrderConfig()) ?>'>
+        <!-- Vue.js application will mount here -->
+        <div class="quick-order-loading">
+            <div class="spinner">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+            <p><?= $block->escapeHtml(__('Loading Quick Order...')) ?></p>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "#quick-order-app": {
+        "Lof_FastOrder/js/quick-order-app": {}
+    }
+}
+</script>

@@ -27,6 +27,7 @@ use Lof\FastOrder\Api\FastSearchProductManagementInterface;
 use Lof\FastOrder\Helper\Data;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -90,6 +91,11 @@ class FastSearchProductManagement implements FastSearchProductManagementInterfac
     protected $productStatus;
     protected $productVisibility;
     protected $_currency;
+
+    /**
+     * @var StockRegistryInterface
+     */
+    private $stockRegistry;
 
     /**
      * FastSearchProductManagement constructor.
@@ -255,6 +261,88 @@ class FastSearchProductManagement implements FastSearchProductManagementInterfac
             $amountValue = $amountValue * $rate;
 
             return $amountValue;
+        }
+
+        /**
+         * Enhanced search for products with better filtering and data
+         *
+         * @param string $query
+         * @param int $storeId
+         * @param int $limit
+         * @return array
+         */
+        public function searchProducts($query, $storeId = null, $limit = 10)
+        {
+            if (empty($query) || strlen($query) < 2) {
+                return [];
+            }
+
+            $storeId = $storeId ?: $this->storeManagerInterface->getStore()->getId();
+            
+            /** @var Collection $collection */
+            $collection = $this->productCollection->create()
+                ->addAttributeToSelect(['name', 'sku', 'price', 'special_price', 'manufacturer', 'short_description'])
+                ->addStoreFilter($storeId)
+                ->addAttributeToFilter('status', $this->productStatus->getVisibleStatusIds())
+                ->addAttributeToFilter('visibility', $this->productVisibility->getVisibleInSearchIds())
+                ->setPageSize($limit);
+
+            // Apply search filters
+            $collection->addAttributeToFilter([
+                ['attribute' => 'name', 'like' => '%' . $query . '%'],
+                ['attribute' => 'sku', 'like' => '%' . $query . '%'],
+            ]);
+
+            $products = [];
+            foreach ($collection as $product) {
+                $stockItem = $this->getStockRegistry()->getStockItem($product->getId(), $storeId);
+                
+                $products[] = [
+                    'entity_id' => $product->getId(),
+                    'sku' => $product->getSku(),
+                    'name' => $product->getName(),
+                    'price' => $product->getPrice(),
+                    'special_price' => $product->getSpecialPrice(),
+                    'manufacturer' => $product->getManufacturer(),
+                    'short_description' => $product->getShortDescription(),
+                    'stock_qty' => $stockItem ? $stockItem->getQty() : 0,
+                    'is_in_stock' => $stockItem ? $stockItem->getIsInStock() : false,
+                    'pack_size' => $this->extractPackSize($product->getName())
+                ];
+            }
+
+            return $products;
+        }
+
+        /**
+         * Extract pack size from product name
+         *
+         * @param string $name
+         * @return string
+         */
+        private function extractPackSize($name)
+        {
+            // Pattern to match pack sizes like "10x10", "1x3", "20ml", etc.
+            if (preg_match('/(\d+x\d+|\d+\s*ml|\d+\s*gm)/i', $name, $matches)) {
+                return $matches[1];
+            }
+            
+            return '';
+        }
+
+        /**
+         * Get stock registry (lazy initialization to avoid circular dependency)
+         *
+         * @return StockRegistryInterface
+         */
+        private function getStockRegistry()
+        {
+            if (!$this->stockRegistry) {
+                $this->stockRegistry = \Magento\Framework\App\ObjectManager::getInstance()
+                    ->get(StockRegistryInterface::class);
+            }
+            
+            return $this->stockRegistry;
         }
     }
 }

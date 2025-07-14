@@ -39,6 +39,7 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\MediaStorage\Model\File\UploaderFactory;
 use Magento\Store\Model\StoreManager;
+use Lof\FastOrder\Model\FuzzyMatcher;
 use Psr\Log\LoggerInterface;
 
 class UploadCsv extends Action
@@ -112,6 +113,11 @@ class UploadCsv extends Action
     private $storeManager;
 
     /**
+     * @var FuzzyMatcher
+     */
+    private $fuzzyMatcher;
+
+    /**
      * Constructor
      *
      * @param Context $context
@@ -126,6 +132,7 @@ class UploadCsv extends Action
      * @param StockItemRepository $stockItemRepository
      * @param PriceCurrencyInterface $priceCurrency
      * @param StoreManager $storeManager
+     * @param FuzzyMatcher $fuzzyMatcher
      * @throws FileSystemException
      */
     public function __construct(
@@ -140,7 +147,8 @@ class UploadCsv extends Action
         LoggerInterface $logger,
         StockItemRepository $stockItemRepository,
         PriceCurrencyInterface $priceCurrency,
-        StoreManager $storeManager
+        StoreManager $storeManager,
+        FuzzyMatcher $fuzzyMatcher
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
@@ -153,6 +161,7 @@ class UploadCsv extends Action
         $this->stockItemRepository = $stockItemRepository;
         $this->priceCurrency = $priceCurrency;
         $this->storeManager = $storeManager;
+        $this->fuzzyMatcher = $fuzzyMatcher;
 
         $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
     }
@@ -170,19 +179,17 @@ class UploadCsv extends Action
     public function execute()
     {
         try {
-            $products = $this->uploadFile();
+            $result = $this->uploadFile();
 
             return $this->jsonResponse([
                 'success' => true,
-                'products' => [
-                    'product' => $products['product']
-                ]
+                'data' => $result
             ]);
         } catch (\Exception $e) {
             $this->logger->critical($e->getMessage());
             return $this->jsonResponse([
                 'success' => false,
-                'error' => $e->getMessage()
+                'message' => $e->getMessage()
             ]);
         }
     }
@@ -215,7 +222,7 @@ class UploadCsv extends Action
     }
 
     /**
-     * Read data from CSV file
+     * Read data from CSV file with fuzzy matching
      *
      * @param string $filePath
      * @return array
@@ -232,38 +239,100 @@ class UploadCsv extends Action
             );
         }
 
-        $storeCode = $this->getRequest()->getParam('storeCode');
-        $storeId = 0;
-
-        try {
-            $store = $this->storeManager->getStore($storeCode);
-            $storeId = (int) $store->getId();
-        } catch (\Exception $e) {
-            $this->logger->warning("Invalid store code provided: " . $storeCode);
+        if (empty($csvData)) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('CSV file is empty or invalid.')
+            );
         }
 
-        // Collect SKUs from CSV (assuming SKU is in first column, and header row exists)
-        $csvSkus = [];
-        foreach ($csvData as $index => $row) {
-            if ($index === 0) continue; // Skip header
-            if (!empty($row[0])) {
-                $csvSkus[] = trim($row[0]);
+        $storeId = $this->getRequest()->getParam('store_id', $this->storeManager->getStore()->getId());
+        
+        // Parse CSV headers
+        $headers = array_map('trim', $csvData[0]);
+        $headerMap = $this->mapCsvHeaders($headers);
+        
+        if (!isset($headerMap['product_name'])) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('CSV file must contain a "Product Name" column.')
+            );
+        }
+
+        $processedItems = [];
+        $totalRows = count($csvData);
+        
+        // Process each row (skip header)
+        for ($i = 1; $i < $totalRows; $i++) {
+            $row = $csvData[$i];
+            
+            if (empty($row) || count($row) < count($headers)) {
+                continue;
+            }
+
+            $originalName = trim($row[$headerMap['product_name']]);
+            if (empty($originalName)) {
+                continue;
+            }
+
+            $qty = isset($headerMap['qty']) && isset($row[$headerMap['qty']]) 
+                ? (int)$row[$headerMap['qty']] 
+                : 1;
+                
+            $freeQty = isset($headerMap['free_qty']) && isset($row[$headerMap['free_qty']]) 
+                ? (int)$row[$headerMap['free_qty']] 
+                : 0;
+
+            // Find matching products using fuzzy matching
+            $matches = $this->fuzzyMatcher->findMatches($originalName, $storeId, 5);
+            
+            $bestMatch = null;
+            $matchScore = 0;
+            
+            if (!empty($matches)) {
+                $bestMatch = $matches[0];
+                $matchScore = $bestMatch['match_score'];
+            }
+
+            $processedItems[] = [
+                'original_name' => $originalName,
+                'qty' => $qty,
+                'free_qty' => $freeQty,
+                'matched_product' => $bestMatch,
+                'match_score' => $matchScore,
+                'suggestions' => $matches,
+                'confidence' => $this->fuzzyMatcher->getConfidenceLevel($matchScore)
+            ];
+        }
+
+        return $processedItems;
+    }
+
+    /**
+     * Map CSV headers to expected column names
+     *
+     * @param array $headers
+     * @return array
+     */
+    private function mapCsvHeaders($headers)
+    {
+        $headerMap = [];
+        $mapping = [
+            'product_name' => ['product name', 'product_name', 'name', 'item name', 'drug name'],
+            'qty' => ['qty', 'quantity', 'order qty', 'order quantity'],
+            'free_qty' => ['free qty', 'free_qty', 'free quantity', 'bonus qty']
+        ];
+
+        foreach ($headers as $index => $header) {
+            $normalizedHeader = strtolower(trim($header));
+            
+            foreach ($mapping as $field => $variations) {
+                if (in_array($normalizedHeader, $variations)) {
+                    $headerMap[$field] = $index;
+                    break;
+                }
             }
         }
 
-        // Fetch matched products
-        $matchedProducts = $this->dataHelper->getDataByListSkuQty($csvData, $storeId);
-
-        // Extract SKUs from matched products
-        $matchedSkus = array_column($matchedProducts, 'sku');
-
-        // Find not found SKUs
-        $notFoundSkus = array_diff($csvSkus, $matchedSkus);
-
-        return [
-            'product' => $matchedProducts,
-            'not_found' => array_values($notFoundSkus)
-        ];
+        return $headerMap;
     }
 
     /**

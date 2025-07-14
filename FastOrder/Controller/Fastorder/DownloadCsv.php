@@ -53,19 +53,21 @@ class DownloadCsv extends Action
     public function execute()
     {
         $heading = [
-            __('Name'),
-            __('Qty')
+            __('Product Name'),
+            __('Qty'),
+            __('Free Qty')
         ];
 
-        // Multiple rows of name and quantity
+        // Multiple rows of sample pharmaceutical products
         $body = [
-            ['PAN D CAP', '3'],
-            ['DOLO 650 TAB', '2'],
-            ['CANDID POWDER 60GM', '1'],
-            ['CITRALKA LIQ', '4']
+            ['Paracetamol 500mg Tablets', '100', '20'],
+            ['Amoxicillin 250mg Capsules', '50', '10'],
+            ['Omeprazole 20mg Tablets', '25', '4'],
+            ['Azithromycin 500mg Tablets', '80', '0'],
+            ['CROCIN ADVANCE TAB', '100', '0']
         ];
 
-        $outputFile = "fast-order-example.csv";
+        $outputFile = "quick-order-template.csv";
         $handle = fopen($outputFile, 'w');
         fputcsv($handle, $heading); // Add header row
 

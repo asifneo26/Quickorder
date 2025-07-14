@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Quick Order - Bulk Ordering</title>
+        <css src="Lof_FastOrder::css/quick-order.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Lof\FastOrder\Block\QuickOrder" name="quickorder.main" template="Lof_FastOrder::quickorder/main.phtml">
+                <arguments>
+                    <argument name="cache_lifetime" xsi:type="number">86400</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
