@@ -157,11 +157,13 @@
             },
             formatCurrency: function (t) {
                if (this.currencyCode) {
-                  var e = f.a.getLocales(this.currencyCode)[0];
-                  return new Intl.NumberFormat(e, {
-                     style: "currency",
-                     currency: this.currencyCode
-                  }).format(t)
+                  // Custom formatting for Indian Rupees to ensure correct decimal and thousand separators
+                  var fixedAmount = t.toFixed(2);
+                  var parts = fixedAmount.split('.');
+                  var integerPart = parts[0];
+                  var decimalPart = parts[1];
+                  var formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                  return 'Rs ' + formattedInteger + '.' + decimalPart;
                }
             }
          },
