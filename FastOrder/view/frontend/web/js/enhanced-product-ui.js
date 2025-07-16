@@ -193,7 +193,7 @@ define([
         });
     }
 
-    function updateRowSubtotal($row) {
+        function updateRowSubtotal($row) {
         const qty = parseFloat($row.find('input[type="number"]').val()) || 0;
         const ptr = parseFloat($row.find('.wrapPtr__As8_S__fast_order').text()) || 0;
         const discount = parseFloat($row.find('.wrapDiscount__As8_S__fast_order').text()) || 0;
@@ -202,7 +202,18 @@ define([
         const discountAmt = price * (discount / 100);
         const total = price - discountAmt;
 
-        const formatted = `Rs ${total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        // Custom formatting for Indian Rupees to ensure correct decimal and thousand separators
+        const formatIndianCurrency = (amount) => {
+            // Fix to 2 decimal places
+            const fixedAmount = amount.toFixed(2);
+            // Split into integer and decimal parts
+            const [integerPart, decimalPart] = fixedAmount.split('.');
+            // Add commas as thousand separators (Indian number system)
+            const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return `Rs ${formattedInteger}.${decimalPart}`;
+        };
+
+        const formatted = formatIndianCurrency(total);
         $row.find('.wrapSubTotal__3x0vV__fast_order').html(formatted);
     }
 
