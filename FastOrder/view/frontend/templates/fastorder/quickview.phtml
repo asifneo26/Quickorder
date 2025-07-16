@@ -31,7 +31,7 @@ if($filterAttribute){
 ?>
 <input type="hidden" id="fast-order-store-id" value="<?php echo $block->getStoreId(); ?>" />
 <input type="hidden" id="fast-order-store-code" value="<?php echo $block->getStoreCode(); ?>" />
-<div data-mage-init='{"quickview": {"message": "<?php echo $block->escapeHtmlAttr(__('fast order'));?>"}}' data-params='{"translate":<?php echo $translateTextString; ?>, "filterAttribute":<?php echo $filterAttributeString; ?>}' id="fast-order-container">
+<div data-mage-init='{"quickview": {"message": "<?php echo $block->escapeHtmlAttr(__('fast order'));?>"}, "enhancedProductUI": {}}' data-params='{"translate":<?php echo $translateTextString; ?>, "filterAttribute":<?php echo $filterAttributeString; ?>}' id="fast-order-container">
     <!--    to mount html view-->
     <div class="fastorder-loading"><div class="lds-ripple"><div></div><div></div></div></div>
 </div>

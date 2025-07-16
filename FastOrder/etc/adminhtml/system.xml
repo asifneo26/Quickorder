@@ -143,22 +143,31 @@
                     <label>Fast order</label>
                 </field>
                 <field id="text_products" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="3" translate="label" type="text" canRestore="1">
-                    <label>Product(s)</label>
+                    <label>Product Name</label>
                 </field>
                 <field id="text_sku" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text" canRestore="1">
                     <label>Sku</label>
+                </field>
+                <field id="text_packsize" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text" canRestore="1">
+                    <label>Pack Size</label>
+                </field>
+                <field id="text_qty" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="12" translate="label" type="text" canRestore="1">
+                    <label>Qty</label>
+                </field>
+                <field id="text_freeqty" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="12" translate="label" type="text" canRestore="1">
+                    <label>Free Qty</label>
+                </field>
+                <field id="text_mrp" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text" canRestore="1">
+                    <label>MRP</label>
                 </field>
                 <field id="text_ptr" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text" canRestore="1">
                     <label>PTR</label>
                 </field>
                 <field id="text_discount" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text" canRestore="1">
-                    <label>Discount</label>
-                </field>
-                <field id="text_qty" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="12" translate="label" type="text" canRestore="1">
-                    <label>Qty</label>
+                    <label>Discount%</label>
                 </field>
                 <field id="text_subtotal" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="text" canRestore="1">
-                    <label>Subtotal</label>
+                    <label>Sub Total</label>
                 </field>
                 <field id="text_action" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="text" canRestore="1">
                     <label>Action</label>

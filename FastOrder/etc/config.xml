@@ -33,11 +33,14 @@
             </design>
             <translate>
                 <text_fastorder>Fast order</text_fastorder>
-                <text_products>Product(s)</text_products>
+                <text_products>Product Name</text_products>
                 <text_sku>Sku</text_sku>
-                <text_ptr>PTR</text_ptr>
-                <text_discount>Discount</text_discount>
+                <text_packsize>Pack Size</text_packsize>
                 <text_qty>Qty</text_qty>
+                <text_freeqty>Free Qty</text_freeqty>
+                <text_mrp>MRP</text_mrp>
+                <text_ptr>PTR</text_ptr>
+                <text_discount>Discount%</text_discount>
                 <text_subtotal>Subtotal</text_subtotal>
                 <text_action>Action</text_action>
                 <text_total_qty>Total Qty:</text_total_qty>
@@ -46,7 +49,7 @@
                 <text_checkout>CHECKOUT</text_checkout>
                 <text_add_from_file>Add from file</text_add_from_file>
                 <text_choose_file>Choose File</text_choose_file>
-                <text_download_a_samle_csv_file>Download a sample CSV file</text_download_a_samle_csv_file>
+                <text_download_a_samle_csv_file>Download CSV Template</text_download_a_samle_csv_file>
                 <text_enter_multiple_skus>Enter multiple SKUs</text_enter_multiple_skus>
                 <text_enter_multiple_skus_note><![CDATA[<p>Format: SKU:qty</p> <p>E.g simple product: 24-MB01:1</p> <p>E.g configuration product: MH02:1</p> <p>E.g bundle product: 24-WG080:1</p> <p>E.g grouped product: 24-WG085_Group</p>]]></text_enter_multiple_skus_note>
                 <text_add_to_list>Add to list</text_add_to_list>

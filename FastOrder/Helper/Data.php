@@ -310,11 +310,14 @@ class Data extends AbstractHelper
             $text_fastorder = $this->getConfig("translate/text_fastorder");
             $text_products = $this->getConfig("translate/text_products");
             $text_sku = $this->getConfig("translate/text_sku");
+            $text_packsize = $this->getConfig("translate/text_packsize");
+            $text_qty = $this->getConfig("translate/text_qty");
+            $text_freeqty = $this->getConfig("translate/text_freeqty");
+            $text_mrp = $this->getConfig("translate/text_mrp");
             $text_ptr = $this->getConfig("translate/text_ptr");
             $text_discount = $this->getConfig("translate/text_discount");
             $text_subtotal = $this->getConfig("translate/text_subtotal");
             $text_action = $this->getConfig("translate/text_action");
-            $text_qty = $this->getConfig("translate/text_qty");
             $text_total_qty = $this->getConfig("translate/text_total_qty");
             $text_sub_total = $this->getConfig("translate/text_sub_total");
             $text_add_to_cart = $this->getConfig("translate/text_add_to_cart");
@@ -330,11 +333,14 @@ class Data extends AbstractHelper
                                     "text_fastorder" => $text_fastorder,
                                     "text_products" => $text_products,
                                     "text_sku" => $text_sku,
+                                    "text_packsize" => $text_packsize,
+                                    "text_qty" => $text_qty,
+                                    "text_freeqty" => $text_freeqty,
+                                    "text_mrp" => $text_mrp,
                                     "text_ptr" => $text_ptr,
                                     "text_discount" => $text_discount,
                                     "text_subtotal" => $text_subtotal,
                                     "text_action" => $text_action,
-                                    "text_qty" => $text_qty,
                                     "text_total_qty" => $text_total_qty,
                                     "text_add_to_cart" => $text_add_to_cart,
                                     "text_checkout" => $text_checkout,
@@ -670,9 +676,21 @@ class Data extends AbstractHelper
 
         $notFound = array_diff(array_keys($listCsv), $matchedKeys);
 
+        $notFoundFormatted = array_map(function($key) use ($listCsv) {
+            return [
+                'name' => $key,
+                'pack_size' => 0,
+                'fast_csv_qty' => isset($listCsv[$key]['qty']) ? $listCsv[$key]['qty'] : 0,
+                'scheme' => 0,
+                'ptr' => 0,
+                'oldPrice' => 0,
+                'discount' => 0
+            ];
+        }, array_values($notFound));
+
         return [
             'product' => array_values($allProductsByKey),
-            'not_found' => array_values($notFound)
+            'not_found' => $notFoundFormatted
         ];
     }
 
